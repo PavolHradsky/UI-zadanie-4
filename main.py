@@ -14,10 +14,10 @@ class Coord:
 def draw(init, i):
     red, green, blue, purple = init
 
-    plt.scatter([x[0] for x in red], [y[1] for y in red], c='#ff0000')
-    plt.scatter([x[0] for x in green], [y[1] for y in green], c='#00ff00')
-    plt.scatter([x[0] for x in blue], [y[1] for y in blue], c='#0000ff')
-    plt.scatter([x[0] for x in purple], [y[1] for y in purple], c='#800080')
+    plt.scatter([x.x for x in red], [y.y for y in red], c='#ff0000')
+    plt.scatter([x.x for x in green], [y.y for y in green], c='#00ff00')
+    plt.scatter([x.x for x in blue], [y.y for y in blue], c='#0000ff')
+    plt.scatter([x.x for x in purple], [y.y for y in purple], c='#800080')
     plt.show()
     # plt.savefig(f'img/plot{i}.png')
 
@@ -36,35 +36,26 @@ def knn(init, x, y, k):
     red, green, blue, purple = init
     # result = init[0] + init[1] + init[2] + init[3]
     all_elements = init[0] + init[1] + init[2] + init[3]
-    result = []
-    i = 10
+    result: list[Coord] = []
+    i = (10000//(len(all_elements)*2))*k+100
+    # i = 10
     while len(result) < k:
-        result = [(a[0], a[1]) for a in all_elements if is_near(x, y, a[0], a[1], i)]
+        result = [a for a in all_elements if is_near(x, y, a.x, a.y, i)]
+        # i *= 2
         i += 150
-    result = sorted(result, key=lambda a: euclid_distance(a[0], a[1], x, y))
-    # my_red = [item for item in red if is_near(x, y, item[0], item[1], i)]
-    # my_green = [item for item in green if is_near(x, y, item[0], item[1], i)]
-    # my_blue = [item for item in blue if is_near(x, y, item[0], item[1], i)]
-    # my_purple = [item for item in purple if is_near(x, y, item[0], item[1], i)]
+    result = sorted(result, key=lambda a: euclid_distance(a.x, a.y, x, y))
     first_k = []
     for i in range(k):
-        if result[i] in red:
-            first_k.append('r')
-        elif result[i] in green:
-            first_k.append('g')
-        elif result[i] in blue:
-            first_k.append('b')
-        elif result[i] in purple:
-            first_k.append('p')
+        first_k.append(result[i].color)
     most_frequent = max(set(first_k), key=first_k.count)
     if most_frequent == 'r':
-        red.append((x, y))
+        red.append(Coord(x, y, 'r'))
     elif most_frequent == 'g':
-        green.append((x, y))
+        green.append(Coord(x, y, 'g'))
     elif most_frequent == 'b':
-        blue.append((x, y))
+        blue.append(Coord(x, y, 'b'))
     elif most_frequent == 'p':
-        purple.append((x, y))
+        purple.append(Coord(x, y, 'p'))
 
 
 def generate_random(colors, last_color):
@@ -96,10 +87,15 @@ def main():
     green = [(+4500, -4400), (+4100, -3000), (+1800, -2400), (+2500, -3400), (+2000, -1400)]
     blue = [(-4500, +4400), (-4100, +3000), (-1800, +2400), (-2500, +3400), (-2000, +1400)]
     purple = [(+4500, +4400), (+4100, +3000), (+1800, +2400), (+2500, +3400), (+2000, +1400)]
+    red = [Coord(item[0], item[1], 'r') for item in red]
+    green = [Coord(item[0], item[1], 'g') for item in green]
+    blue = [Coord(item[0], item[1], 'b') for item in blue]
+    purple = [Coord(item[0], item[1], 'p') for item in purple]
+
     colors = ['r', 'g', 'b', 'p']
     last_color = ''
     start = time.time()
-    for i in range(10000):
+    for i in range(20000):
         if i % 100 == 0:
             print(i)
             # draw((red, green, blue, purple), i)
